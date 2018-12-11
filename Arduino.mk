@@ -63,7 +63,7 @@
 #
 # On Windows declare this environmental variables using the windows
 # configuration options or Cygwin .bashrc. Control Panel > System > Advanced system settings
-# The paths must use Unix style forward slash and not have any spaces 
+# The paths must use Unix style forward slash and not have any spaces
 # or escape charactors. One must use a symbolic link if the path does
 # contain spaces.
 #
@@ -1650,14 +1650,17 @@ upload:		$(TARGET_HEX) verify_size
 ifeq ($(findstring sam, $(strip $(ARCHITECTURE))), sam)
 # do reset toggle at 1200 BAUD to enter bootloader if using avrdude or bossa
 ifeq ($(strip $(UPLOAD_TOOL)), avrdude)
-		$(MAKE) reset
+#		$(MAKE) reset
+		$(RESET_CMD)
 else ifeq ($(findstring bossac, $(strip $(UPLOAD_TOOL))), bossac)
 		$(MAKE) reset
 endif
 		$(MAKE) do_sam_upload
 else
-		$(MAKE) reset
-		$(MAKE) do_upload
+#		$(MAKE) reset
+#		$(MAKE) do_upload
+		$(RESET_CMD)
+		$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ARD_OPTS) $(AVRDUDE_UPLOAD_HEX)
 endif
 
 raw_upload:	$(TARGET_HEX) verify_size
@@ -1813,6 +1816,13 @@ endif
 
 help_vars:
 		@$(CAT) $(ARDMK_DIR)/arduino-mk-vars.md
+
+avanti: $(TARGET_HEX)
+	$(RESET_CMD)
+	$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ARD_OPTS) $(AVRDUDE_UPLOAD_HEX)
+	$(ARD_UTIL) --ifcaterina --disappear --appear
+	@$(ECHO) "Use CTRL-ALT GR-] to exit monitor.\n"
+	$(MONITOR_CMD) $(get_monitor_port) $(MONITOR_BAUDRATE)
 
 help:
 		@$(ECHO) "\nAvailable targets:\n\
