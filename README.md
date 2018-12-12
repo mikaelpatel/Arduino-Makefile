@@ -18,8 +18,12 @@ and includes on-device debugging targets.
 We recommend 1.6.3 or above version of Arduino IDE.
 - Automatic dependency tracking. Referred libraries are automatically included
 in the build process. Changes in `*.h` files lead to recompilation of sources which include them
+- Wrapper to eliminate need to write makefiles
 
 ## Installation
+
+This version is only available as clone/download from github. Below
+does not apply.
 
 ### Through package
 
@@ -137,8 +141,8 @@ Assuming you included Python in your Cygwin installation:
 1. download PySerial source package from [https://pypi.python.org/pypi/pyserial](https://pypi.python.org/pypi/pyserial)
 2. extract downloaded package running `tar xvzf dowloaded_package_name.tar.gz`
 3. navigate to extracted package folder
-4. build and install Python module: 
- 
+4. build and install Python module:
+
 ```
 python setup.py build
 python setup.py install
@@ -383,7 +387,7 @@ With the ARM chipset and using a CMSIS-DAP tool, on-device debugging is made ava
   connecting to the target with `make debug`. If using a Black Magic Probe,
   one can just use `make debug`. At the moment, a system wide `arm-none-eabi-gdb` must be
   installed as the one supplied with the Arduino toolchain
-  does not appear to work. 
+  does not appear to work.
 * Example usage: https://asciinema.org/a/Jarz7Pr3gD6mqaZvCACQBzqix
 * See the examples/MZeroBlink Makefile for a commented example.
 

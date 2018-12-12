@@ -28,6 +28,9 @@ I tried to give credit whenever possible. If I have missed anyone, kindly add it
 - New: Add support for BOARD_CLOCK for board.menu.speed and board.menu.clock entries in boards.txt files. (https://github.com/dewhisna)
 - New: Updated Arch instructions. (https://github.com/Akram-Chehaima)
 
+### 2.0.0 (2018-12-12)
+- New: Add command line build and remove need to write makefile.
+
 ### 1.6.0 (2017-07-11)
 - Fix: Allowed for SparkFun's weird usb pid/vid submenu shenanigans (issue #499). (https://github.com/sej7278)
 - Fix: Do not include the Arduino header when calling generate_assembly on .cpp files. (https://github.com/Batchyx)
@@ -40,10 +43,9 @@ I tried to give credit whenever possible. If I have missed anyone, kindly add it
 - New: Add support for Robotis OpenCM boards
 
 ### 1.5.2 (2017-01-11)
-
 - New: Add LTO support for users with avr-gcc > 4.9 (issue #446 & #456) (https://github.com/sej7278)
 - Tweak: Updated Linux instructions and sync documentation from the old blog(), README.md and Arduino.mk (https://github.com/az-z)
-- Tweak: Documentation for Windows updated to include installation of PySerial (https://github.com/sovcik) 
+- Tweak: Documentation for Windows updated to include installation of PySerial (https://github.com/sovcik)
 - Fix: Updated CXXFLAGS_STD to match upstream 1.6 (issue #424) (https://github.com/calvinli)
 - Fix: Added support for attiny core's use of chip instead of cpu in submenus (https://github.com/straccio)
 - Fix: ARDUINO_VERSION can cope with the longer 1.6.10 version string (issue #444) (https://github.com/sej7278)
