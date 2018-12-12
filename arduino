@@ -37,26 +37,32 @@ then
    exit 1
 fi
 
-[ -z "$SKETCHBOOK_DIR" ] && SKETCHBOOK_DIR=$HOME/Arduino ; export SKETCHBOOK_DIR
+[ -z "$SKETCHBOOK_DIR" ] \
+    && SKETCHBOOK_DIR=$HOME/Arduino ; \
+    export SKETCHBOOK_DIR
+
+[ -z "$ARDMK_DIR" ] \
+    && ARDMK_DIR=$SKETCHBOOK_DIR/Arduino-Makefile ; \
+    export ARDMK_DIR
 
 if [ "$1" == "help" ];
 then
-   make -f $SKETCHBOOK_DIR/Arduino-Makefile/Wrapper.mk help "ARDUINO_QUIET=1"
+   make -f $ARDMK_DIR/Wrapper.mk help "ARDUINO_QUIET=1"
    exit 0
 fi
 
 if [ "$1" == "boards" ];
 then
-   make -f $SKETCHBOOK_DIR/Arduino-Makefile/Wrapper.mk boards "ARDUINO_QUIET=1"
+   make -f $ARDMK_DIR/Wrapper.mk show_boards "ARDUINO_QUIET=1"
    exit 0
 fi
 
 if [ "$2" == "config" ];
 then
-   make -f $SKETCHBOOK_DIR/Arduino-Makefile/Wrapper.mk "BOARD_TAG=$1" config
+   make -f $ARDMK_DIR/Wrapper.mk "BOARD=$1" config
    exit 0
 fi
 
 BOARD=$1
 shift
-make -j -f $SKETCHBOOK_DIR/Arduino-Makefile/Wrapper.mk "BOARD_TAG=$BOARD" "ARDUINO_QUIET=1" $*
+make -j -f $ARDMK_DIR/Wrapper.mk "BOARD=$BOARD" "ARDUINO_QUIET=1" $*

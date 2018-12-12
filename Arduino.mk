@@ -1139,10 +1139,7 @@ else
 endif
 
 # Using += instead of =, so that CPPFLAGS can be set per sketch level
-CPPFLAGS      += -$(MCU_FLAG_NAME)=$(MCU) -DF_CPU=$(F_CPU) -DARDUINO=$(ARDUINO_VERSION) $(ARDUINO_ARCH_FLAG) \
-        -I$(ARDUINO_CORE_PATH) -I$(ARDUINO_VAR_PATH)/$(VARIANT) \
-        $(SYS_INCLUDES) $(PLATFORM_INCLUDES) $(USER_INCLUDES) -Wall -ffunction-sections \
-        -fdata-sections
+CPPFLAGS      += -$(MCU_FLAG_NAME)=$(MCU) -DF_CPU=$(F_CPU) -DARDUINO=$(ARDUINO_VERSION) $(ARDUINO_ARCH_FLAG) -I$(ARDUINO_CORE_PATH) -I$(ARDUINO_VAR_PATH)/$(VARIANT) $(SYS_INCLUDES) $(PLATFORM_INCLUDES) $(USER_INCLUDES) -Wall -ffunction-sections -fdata-sections
 
 # PROG_TYPES_COMPAT is enabled by default for compatibility with the Arduino IDE.
 # By placing it before the user-provided CPPFLAGS rather than after, we allow the
@@ -1234,8 +1231,7 @@ ifneq ($(strip $(MONITOR_PORT)),)
 else
     # If no port is specified, try to guess it from wildcards.
     # Will only work if the Arduino is the only/first device matched.
-    DEVICE_PATH = $(firstword $(wildcard \
-			/dev/ttyACM? /dev/ttyUSB? /dev/tty.usbserial* /dev/tty.usbmodem* /dev/tty.wchusbserial*))
+    DEVICE_PATH = $(firstword $(wildcard /dev/ttyACM? /dev/ttyUSB? /dev/tty.usbserial* /dev/tty.usbmodem* /dev/tty.wchusbserial*))
     $(call show_config_variable,DEVICE_PATH,[AUTODETECTED])
 endif
 
@@ -1457,8 +1453,7 @@ endif
 
 $(OBJDIR)/%.eep: $(OBJDIR)/%.elf $(COMMON_DEPS)
 	@$(MKDIR) $(dir $@)
-	-$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom='alloc,load' \
-		--no-change-warnings --change-section-lma .eeprom=0 -O ihex $< $@
+	-$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom='alloc,load' --no-change-warnings --change-section-lma .eeprom=0 -O ihex $< $@
 
 $(OBJDIR)/%.lss: $(OBJDIR)/%.elf $(COMMON_DEPS)
 	@$(MKDIR) $(dir $@)
@@ -1672,8 +1667,7 @@ else
 endif
 
 do_upload:
-		$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ARD_OPTS) \
-			$(AVRDUDE_UPLOAD_HEX)
+		$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ARD_OPTS) $(AVRDUDE_UPLOAD_HEX)
 
 do_sam_upload:  $(TARGET_BIN) verify_size
 ifeq ($(findstring openocd, $(strip $(UPLOAD_TOOL))), openocd)
@@ -1689,8 +1683,7 @@ else
 endif
 
 do_eeprom:	$(TARGET_EEP) $(TARGET_HEX)
-		$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ARD_OPTS) \
-			$(AVRDUDE_UPLOAD_EEP)
+		$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ARD_OPTS) $(AVRDUDE_UPLOAD_EEP)
 
 eeprom:		$(TARGET_HEX) verify_size
 		$(MAKE) reset
@@ -1716,8 +1709,7 @@ reset_stty:
 		$$STTYF $(call get_monitor_port) -hupcl
 
 ispload:	$(TARGET_EEP) $(TARGET_HEX) verify_size
-		$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ISP_OPTS) -e \
-			$(AVRDUDE_ISPLOAD_OPTS)
+		$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ISP_OPTS) -e $(AVRDUDE_ISPLOAD_OPTS)
 
 burn_bootloader:
 ifeq ($(findstring sam, $(strip $(ARCHITECTURE))), sam)

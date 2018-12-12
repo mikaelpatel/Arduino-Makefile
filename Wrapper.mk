@@ -24,16 +24,39 @@ ifndef ARDUINO_DIR
   ARDUINO_DIR = $(HOME)/opt/arduino-$(ARDUINO_VER)
 endif
 
-ARDUINO_AVR_DIR = $(ARDUINO_DIR)/hardware/arduino/avr/
+ARDUINO_AVR_DIR = $(ARDUINO_DIR)/hardware/arduino/avr
 ARDUINO_CORE_PATH = $(ARDUINO_AVR_DIR)/cores/arduino
 ARDUINO_VAR_PATH = $(ARDUINO_AVR_DIR)/variants
 
-ARDUINO_LIB_PATH = $(SKETCHBOOK_DIR)/libraries
-ARDMK_DIR = $(SKETCHBOOK_DIR)/Arduino-Makefile
-ARDUINO_BUILD_DIR = $(ARDMK_DIR)
-MONITOR_CMD = $(ARDUINO_BUILD_DIR)/bin/miniterm.py -q --lf
-ARD_UTIL = $(ARDUINO_BUILD_DIR)/bin/ard-util.py
+OBJDIR = $(SKETCHBOOK_DIR)/obj/build-$(ARDUINO_VER)/$(BOARD_TAG)/$(TARGET)
 
+MONITOR_CMD = $(ARDMK_DIR)/bin/miniterm.py -q --lf
+ARD_UTIL = $(ARDMK_DIR)/bin/ard-util.py
 BOARDS_TXT = $(ARDUINO_AVR_DIR)/boards.txt
+
+ifeq ($(BOARD),mega)
+  BOARD_TAG = mega
+  BOARD_SUB = atmega2560
+else ifeq ($(BOARD),mega-1280)
+  BOARD_TAG = mega
+  BOARD_SUB = atmega1280
+else ifeq ($(BOARD),diecimila)
+  BOARD_TAG = diecimila
+  BOARD_SUB = atmega328
+else ifeq ($(BOARD),diecimila-168)
+  BOARD_TAG = diecimila
+  BOARD_SUB = atmega168
+else ifeq ($(BOARD),nano)
+  BOARD_TAG = nano
+  BOARD_SUB = atmega328
+else ifeq ($(BOARD),mini)
+  BOARD_TAG = mini
+  BOARD_SUB = atmega328
+else ifeq ($(BOARD),mini-168)
+  BOARD_TAG = mini
+  BOARD_SUB = atmega168
+else
+  BOARD_TAG = $(BOARD)
+endif
 
 include $(ARDMK_DIR)/Arduino.mk
