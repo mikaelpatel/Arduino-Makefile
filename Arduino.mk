@@ -1819,6 +1819,7 @@ avanti: $(TARGET_HEX)
 help:
 		@$(ECHO) "\nAvailable targets:\n\
   make                   - compile the code\n\
+  make avanti            - compile, upload and connect to serial port\n\
   make upload            - upload\n\
   make ispload           - upload using an ISP\n\
   make raw_upload        - upload without first resetting\n\

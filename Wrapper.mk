@@ -34,29 +34,9 @@ MONITOR_CMD = $(ARDMK_DIR)/bin/miniterm.py -q --lf
 ARD_UTIL = $(ARDMK_DIR)/bin/ard-util.py
 BOARDS_TXT = $(ARDUINO_AVR_DIR)/boards.txt
 
-ifeq ($(BOARD),mega)
-  BOARD_TAG = mega
-  BOARD_SUB = atmega2560
-else ifeq ($(BOARD),mega-1280)
-  BOARD_TAG = mega
-  BOARD_SUB = atmega1280
-else ifeq ($(BOARD),diecimila)
-  BOARD_TAG = diecimila
-  BOARD_SUB = atmega328
-else ifeq ($(BOARD),diecimila-168)
-  BOARD_TAG = diecimila
-  BOARD_SUB = atmega168
-else ifeq ($(BOARD),nano)
-  BOARD_TAG = nano
-  BOARD_SUB = atmega328
-else ifeq ($(BOARD),mini)
-  BOARD_TAG = mini
-  BOARD_SUB = atmega328
-else ifeq ($(BOARD),mini-168)
-  BOARD_TAG = mini
-  BOARD_SUB = atmega168
-else
-  BOARD_TAG = $(BOARD)
+BOARD_TAG = $(shell echo $(BOARD) | cut -d: -f1)
+ifeq ($(findstring :, $(BOARD)), :)
+  BOARD_SUB = $(shell echo $(BOARD) | cut -d: -f2)
 endif
 
 include $(ARDMK_DIR)/Arduino.mk
