@@ -16,7 +16,9 @@
  * Lesser General Public License for more details.
  *
  * @section Description
- * Empty Arduino sketch file.
+ * Empty Arduino sketch file for command build testing.
+ * Configure Arduino-Makefile and run "arduino uno" to test build
+ * of this empty sketch.
  */
 
 void setup()

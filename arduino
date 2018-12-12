@@ -42,7 +42,7 @@ fi
     export SKETCHBOOK_DIR
 
 [ -z "$ARDMK_DIR" ] \
-    && ARDMK_DIR=$SKETCHBOOK_DIR/Arduino-Makefile ; \
+    && ARDMK_DIR=$SKETCHBOOK_DIR/build ; \
     export ARDMK_DIR
 
 if [ "$1" == "help" ];
