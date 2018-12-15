@@ -151,6 +151,18 @@
 # Besides make upload, there are a couple of other targets that are available.
 # Do make help to get the complete list of targets and their description
 #
+# Alternativly, you skip all the above and use the makefile-less wrapper:
+#
+#   $ arduino BOARD     	 - compile sketch
+#   $ arduino BOARD upload     	 - upload sketch
+#   $ arduino BOARD monitor      - connect to board serial port
+#   $ arduino BOARD avanti     	 - compile, upload and connect to board
+#   $ arduino BOARD show_submenu - list subtags for board.
+#
+# BOARD is the name of the Arduino board from the boards.txt file,
+# e.g. uno, nano, mini, mega, etc. Some boards have a submenu. Use the
+# board syntax, BOARD:SUBTAG, e.g. nano:atmega328.
+#
 ########################################################################
 #
 # SERIAL MONITOR
@@ -1609,7 +1621,7 @@ endif
 ########################################################################
 # Explicit targets start here
 
-all: 		$(TARGET_EEP) $(TARGET_BIN) $(TARGET_HEX)
+all: $(TARGET_EEP) $(TARGET_BIN) $(TARGET_HEX)
 
 # Rule to create $(OBJDIR) automatically. All rules with recipes that
 # create a file within it, but do not already depend on a file within it
@@ -1618,137 +1630,137 @@ all: 		$(TARGET_EEP) $(TARGET_BIN) $(TARGET_HEX)
 # list) to prevent remaking the target when any file in the directory
 # changes.
 $(OBJDIR): pre-build
-		$(MKDIR) $(OBJDIR)
+	$(MKDIR) $(OBJDIR)
 
 pre-build:
-		$(call runscript_if_exists,$(PRE_BUILD_HOOK))
+	$(call runscript_if_exists,$(PRE_BUILD_HOOK))
 
 # copied from arduino with start-group, end-group
-$(TARGET_ELF): 	$(LOCAL_OBJS) $(CORE_LIB) $(OTHER_OBJS)
+$(TARGET_ELF): $(LOCAL_OBJS) $(CORE_LIB) $(OTHER_OBJS)
 # sam devices need start and end group
 ifeq ($(findstring sam, $(strip $(ARCHITECTURE))), sam)
-		$(CC) $(LINKER_SCRIPTS) -Wl,-Map=$(OBJDIR)/$(TARGET).map -o $@ $(LOCAL_OBJS) $(OTHER_OBJS) $(OTHER_LIBS) $(LDFLAGS) $(CORE_LIB) -Wl,--end-group
+	$(CC) $(LINKER_SCRIPTS) -Wl,-Map=$(OBJDIR)/$(TARGET).map -o $@ $(LOCAL_OBJS) $(OTHER_OBJS) $(OTHER_LIBS) $(LDFLAGS) $(CORE_LIB) -Wl,--end-group
 # otherwise traditional
 else
-		$(CC) $(LDFLAGS) -o $@ $(LOCAL_OBJS) $(OTHER_OBJS) $(OTHER_LIBS) $(CORE_LIB) -lc -lm $(LINKER_SCRIPTS)
+	$(CC) $(LDFLAGS) -o $@ $(LOCAL_OBJS) $(OTHER_OBJS) $(OTHER_LIBS) $(CORE_LIB) -lc -lm $(LINKER_SCRIPTS)
 endif
 
-$(CORE_LIB):	$(CORE_OBJS) $(LIB_OBJS) $(PLATFORM_LIB_OBJS) $(USER_LIB_OBJS)
-		$(AR) rcs $@ $(CORE_OBJS) $(LIB_OBJS) $(PLATFORM_LIB_OBJS) $(USER_LIB_OBJS)
+$(CORE_LIB): $(CORE_OBJS) $(LIB_OBJS) $(PLATFORM_LIB_OBJS) $(USER_LIB_OBJS)
+	$(AR) rcs $@ $(CORE_OBJS) $(LIB_OBJS) $(PLATFORM_LIB_OBJS) $(USER_LIB_OBJS)
 
 error_on_caterina:
-		$(ERROR_ON_CATERINA)
+	$(ERROR_ON_CATERINA)
 
 # Use submake so we can guarantee the reset happens
 # before the upload, even with make -j
-upload:		$(TARGET_HEX) verify_size
+upload:	$(TARGET_HEX) verify_size
 ifeq ($(findstring sam, $(strip $(ARCHITECTURE))), sam)
 # do reset toggle at 1200 BAUD to enter bootloader if using avrdude or bossa
 ifeq ($(strip $(UPLOAD_TOOL)), avrdude)
-#		$(MAKE) reset
-		$(RESET_CMD)
+#	$(MAKE) reset
+	$(RESET_CMD)
 else ifeq ($(findstring bossac, $(strip $(UPLOAD_TOOL))), bossac)
-		$(MAKE) reset
+	$(MAKE) reset
 endif
-		$(MAKE) do_sam_upload
+	$(MAKE) do_sam_upload
 else
-#		$(MAKE) reset
-#		$(MAKE) do_upload
-		$(RESET_CMD)
-		$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ARD_OPTS) $(AVRDUDE_UPLOAD_HEX)
+#	$(MAKE) reset
+#	$(MAKE) do_upload
+	$(RESET_CMD)
+	$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ARD_OPTS) $(AVRDUDE_UPLOAD_HEX)
 endif
 
-raw_upload:	$(TARGET_HEX) verify_size
+raw_upload: $(TARGET_HEX) verify_size
 ifeq ($(findstring sam, $(strip $(ARCHITECTURE))), sam)
-		$(MAKE) do_sam_upload
+	$(MAKE) do_sam_upload
 else
-		$(MAKE) error_on_caterina
-		$(MAKE) do_upload
+	$(MAKE) error_on_caterina
+	$(MAKE) do_upload
 endif
 
 do_upload:
-		$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ARD_OPTS) $(AVRDUDE_UPLOAD_HEX)
+	$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ARD_OPTS) $(AVRDUDE_UPLOAD_HEX)
 
-do_sam_upload:  $(TARGET_BIN) verify_size
+do_sam_upload: $(TARGET_BIN) verify_size
 ifeq ($(findstring openocd, $(strip $(UPLOAD_TOOL))), openocd)
-		$(OPENOCD) $(OPENOCD_OPTS) -c "telnet_port disabled; program {{$(TARGET_BIN)}} verify reset $(BOOTLOADER_SIZE); shutdown"
+	$(OPENOCD) $(OPENOCD_OPTS) -c "telnet_port disabled; program {{$(TARGET_BIN)}} verify reset $(BOOTLOADER_SIZE); shutdown"
 else ifeq ($(findstring bossac, $(strip $(UPLOAD_TOOL))), bossac)
-		$(BOSSA) $(BOSSA_OPTS) $(TARGET_BIN)
+	$(BOSSA) $(BOSSA_OPTS) $(TARGET_BIN)
 else ifeq ($(findstring gdb, $(strip $(UPLOAD_TOOL))), gdb)
-		$(GDB) $(GDB_UPLOAD_OPTS)
+	$(GDB) $(GDB_UPLOAD_OPTS)
 else ifeq ($(strip $(UPLOAD_TOOL)), avrdude)
-		$(MAKE) ispload
+	$(MAKE) ispload
 else
-		@$(ECHO) "$(BOOTLOADER_UPLOAD_TOOL) not currently supported!\n\n"
+	@$(ECHO) "$(BOOTLOADER_UPLOAD_TOOL) not currently supported!\n\n"
 endif
 
-do_eeprom:	$(TARGET_EEP) $(TARGET_HEX)
-		$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ARD_OPTS) $(AVRDUDE_UPLOAD_EEP)
+do_eeprom: $(TARGET_EEP) $(TARGET_HEX)
+	$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ARD_OPTS) $(AVRDUDE_UPLOAD_EEP)
 
-eeprom:		$(TARGET_HEX) verify_size
-		$(MAKE) reset
-		$(MAKE) do_eeprom
+eeprom:	$(TARGET_HEX) verify_size
+	$(MAKE) reset
+	$(MAKE) do_eeprom
 
-raw_eeprom:	$(TARGET_HEX) verify_size
-		$(MAKE) error_on_caterina
-		$(MAKE) do_eeprom
+raw_eeprom: $(TARGET_HEX) verify_size
+	$(MAKE) error_on_caterina
+	$(MAKE) do_eeprom
 
 reset:
-		$(call arduino_output,Resetting Arduino...)
-		$(RESET_CMD)
+	$(call arduino_output,Resetting Arduino...)
+	$(RESET_CMD)
 
 # stty on MacOS likes -F, but on Debian it likes -f redirecting
 # stdin/out appears to work but generates a spurious error on MacOS at
 # least. Perhaps it would be better to just do it in perl ?
 reset_stty:
-		for STTYF in 'stty -F' 'stty --file' 'stty -f' 'stty <' ; \
-		  do $$STTYF /dev/tty >/dev/null 2>&1 && break ; \
-		done ; \
-		$$STTYF $(call get_monitor_port)  hupcl ; \
-		(sleep 0.1 2>/dev/null || sleep 1) ; \
-		$$STTYF $(call get_monitor_port) -hupcl
+	for STTYF in 'stty -F' 'stty --file' 'stty -f' 'stty <' ; \
+	  do $$STTYF /dev/tty >/dev/null 2>&1 && break ; \
+	done ; \
+	$$STTYF $(call get_monitor_port)  hupcl ; \
+	(sleep 0.1 2>/dev/null || sleep 1) ; \
+	$$STTYF $(call get_monitor_port) -hupcl
 
-ispload:	$(TARGET_EEP) $(TARGET_HEX) verify_size
-		$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ISP_OPTS) -e $(AVRDUDE_ISPLOAD_OPTS)
+ispload: $(TARGET_EEP) $(TARGET_HEX) verify_size
+	$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ISP_OPTS) -e $(AVRDUDE_ISPLOAD_OPTS)
 
 burn_bootloader:
 ifeq ($(findstring sam, $(strip $(ARCHITECTURE))), sam)
     ifeq ($(strip $(BOOTLOADER_UPLOAD_TOOL)), openocd)
-				$(OPENOCD) $(OPENOCD_OPTS) -c "telnet_port disabled; init; halt; $(BOOTLOADER_UNPROTECT); program {{$(BOOTLOADER_PARENT)/$(BOOTLOADER_FILE)}} verify reset; shutdown"
+	$(OPENOCD) $(OPENOCD_OPTS) -c "telnet_port disabled; init; halt; $(BOOTLOADER_UNPROTECT); program {{$(BOOTLOADER_PARENT)/$(BOOTLOADER_FILE)}} verify reset; shutdown"
     else
-				@$(ECHO) "$(BOOTLOADER_UPLOAD_TOOL) not currently supported!\n\n"
+	@$(ECHO) "$(BOOTLOADER_UPLOAD_TOOL) not currently supported!\n\n"
     endif
 else
     ifneq ($(strip $(AVRDUDE_ISP_FUSES_PRE)),)
-				$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ISP_OPTS) -e $(AVRDUDE_ISP_FUSES_PRE)
+	$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ISP_OPTS) -e $(AVRDUDE_ISP_FUSES_PRE)
     endif
     ifneq ($(strip $(AVRDUDE_ISP_BURN_BOOTLOADER)),)
-				$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ISP_OPTS) $(AVRDUDE_ISP_BURN_BOOTLOADER)
+	$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ISP_OPTS) $(AVRDUDE_ISP_BURN_BOOTLOADER)
     endif
     ifneq ($(strip $(AVRDUDE_ISP_FUSES_POST)),)
-				$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ISP_OPTS) $(AVRDUDE_ISP_FUSES_POST)
+	$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ISP_OPTS) $(AVRDUDE_ISP_FUSES_POST)
     endif
 endif
 
 set_fuses:
 ifneq ($(strip $(AVRDUDE_ISP_FUSES_PRE)),)
-		$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ISP_OPTS) $(AVRDUDE_ISP_FUSES_PRE)
+	$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ISP_OPTS) $(AVRDUDE_ISP_FUSES_PRE)
 endif
 ifneq ($(strip $(AVRDUDE_ISP_FUSES_POST)),)
-		$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ISP_OPTS) $(AVRDUDE_ISP_FUSES_POST)
+	$(AVRDUDE) $(AVRDUDE_COM_OPTS) $(AVRDUDE_ISP_OPTS) $(AVRDUDE_ISP_FUSES_POST)
 endif
 
 clean::
-		$(REMOVE) $(OBJDIR)
+	$(REMOVE) $(OBJDIR)
 
 size:	$(TARGET_HEX)
-		$(call avr_size,$(TARGET_ELF),$(TARGET_HEX))
+	$(call avr_size,$(TARGET_ELF),$(TARGET_HEX))
 
 show_boards:
-		@$(CAT) $(BOARDS_TXT) | grep -E '^[a-zA-Z0-9_\-]+.name' | sort -uf | sed 's/.name=/:/' | column -s: -t
+	@$(CAT) $(BOARDS_TXT) | grep -E '^[a-zA-Z0-9_\-]+.name' | sort -uf | sed 's/.name=/:/' | column -s: -t
 
 show_submenu:
-	@$(CAT) $(BOARDS_TXT) | grep -E '[a-zA-Z0-9_\-]+.menu.(cpu|chip).[a-zA-Z0-9_\-]+=' | sort -uf | sed 's/.menu.\(cpu\|chip\)./:/' | sed 's/=/:/' | column -s: -t
+	@$(CAT) $(BOARDS_TXT) | grep $(BOARD_TAG) | grep -E '[a-zA-Z0-9_\-]+.menu.(cpu|chip).[a-zA-Z0-9_\-]+=' | sort -uf | sed 's/.menu.\(cpu\|chip\)./:/' | sed 's/=/:/' | column -s: -t
 
 monitor:
 ifeq ($(notdir $(MONITOR_CMD)), putty)
@@ -1758,11 +1770,11 @@ ifeq ($(notdir $(MONITOR_CMD)), putty)
 	$(MONITOR_CMD) -serial -sercfg $(MONITOR_BAUDRATE) $(call get_monitor_port)
 	endif
 else ifeq ($(notdir $(MONITOR_CMD)), picocom)
-		$(MONITOR_CMD) -b $(MONITOR_BAUDRATE) $(MONITOR_PARAMS) $(call get_monitor_port)
+	$(MONITOR_CMD) -b $(MONITOR_BAUDRATE) $(MONITOR_PARAMS) $(call get_monitor_port)
 else ifeq ($(notdir $(MONITOR_CMD)), cu)
-		$(MONITOR_CMD) -l $(call get_monitor_port) -s $(MONITOR_BAUDRATE)
+	$(MONITOR_CMD) -l $(call get_monitor_port) -s $(MONITOR_BAUDRATE)
 else
-		$(MONITOR_CMD) $(call get_monitor_port) $(MONITOR_BAUDRATE)
+	$(MONITOR_CMD) $(call get_monitor_port) $(MONITOR_BAUDRATE)
 endif
 
 debug_init:
@@ -1772,10 +1784,10 @@ debug:
 	$(GDB) $(GDB_OPTS)
 
 disasm: $(OBJDIR)/$(TARGET).lss
-		@$(ECHO) "The compiled ELF file has been disassembled to $(OBJDIR)/$(TARGET).lss\n\n"
+	@$(ECHO) "The compiled ELF file has been disassembled to $(OBJDIR)/$(TARGET).lss\n\n"
 
 symbol_sizes: $(OBJDIR)/$(TARGET).sym
-		@$(ECHO) "A symbol listing sorted by their size have been dumped to $(OBJDIR)/$(TARGET).sym\n\n"
+	@$(ECHO) "A symbol listing sorted by their size have been dumped to $(OBJDIR)/$(TARGET).sym\n\n"
 
 verify_size:
 ifeq ($(strip $(HEX_MAXIMUM_SIZE)),)
@@ -1785,10 +1797,10 @@ endif
 See http://www.arduino.cc/en/Guide/Troubleshooting#size for tips on reducing it."; false; fi
 
 generate_assembly: $(OBJDIR)/$(TARGET).s
-		@$(ECHO) "Compiler-generated assembly for the main input source has been dumped to $(OBJDIR)/$(TARGET).s\n\n"
+	@$(ECHO) "Compiler-generated assembly for the main input source has been dumped to $(OBJDIR)/$(TARGET).s\n\n"
 
 generated_assembly: generate_assembly
-		@$(ECHO) "\"generated_assembly\" target is deprecated. Use \"generate_assembly\" target instead\n\n"
+	@$(ECHO) "\"generated_assembly\" target is deprecated. Use \"generate_assembly\" target instead\n\n"
 
 tags:
 ifneq ($(words $(wildcard $(TAGS_FILE))), 0)
@@ -1797,8 +1809,8 @@ endif
 	@$(ECHO) "Generating tags for local sources (INO an PDE files as C++): "
 	$(CTAGS_CMD) $(TAGS_FILE) --langmap=c++:+.ino.pde $(LOCAL_SRCS)
 ifneq ($(words $(ARDUINO_LIBS)), 0)
-		@$(ECHO) "Generating tags for project libraries: "
-		$(CTAGS_CMD) $(TAGS_FILE) $(foreach lib, $(ARDUINO_LIBS),$(USER_LIB_PATH)/$(lib)/*)
+	@$(ECHO) "Generating tags for project libraries: "
+	$(CTAGS_CMD) $(TAGS_FILE) $(foreach lib, $(ARDUINO_LIBS),$(USER_LIB_PATH)/$(lib)/*)
 endif
 	@$(ECHO) "Generating tags for Arduino core: "
 	$(CTAGS_CMD) $(TAGS_FILE) $(ARDUINO_CORE_PATH)/*
@@ -1807,7 +1819,7 @@ endif
 	@$(ECHO) "Tag file generation complete, output: $(TAGS_FILE)\n"
 
 help_vars:
-		@$(CAT) $(ARDMK_DIR)/arduino-mk-vars.md
+	@$(CAT) $(ARDMK_DIR)/arduino-mk-vars.md
 
 avanti: $(TARGET_HEX)
 	$(RESET_CMD)
@@ -1817,7 +1829,7 @@ avanti: $(TARGET_HEX)
 	$(MONITOR_CMD) $(get_monitor_port) $(MONITOR_BAUDRATE)
 
 help:
-		@$(ECHO) "\nAvailable targets:\n\
+	@$(ECHO) "\nAvailable targets:\n\
   make                   - compile the code\n\
   make avanti            - compile, upload and connect to serial port\n\
   make upload            - upload\n\
