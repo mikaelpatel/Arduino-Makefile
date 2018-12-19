@@ -94,8 +94,8 @@
 #
 # DEPENDENCIES
 #
-#  to reset a board the (python)  pySerial program is used.
-#  please install it prior to continue.
+# To reset a board the (python)  pySerial program is used.
+# Please install it prior to continue.
 #
 ########################################################################
 #
@@ -107,36 +107,36 @@
 #
 # For example:
 #
-#       ARDUINO_LIBS = Ethernet SPI
-#       BOARD_TAG    = uno
-#       MONITOR_PORT = /dev/cu.usb*
+#   ARDUINO_LIBS = Ethernet SPI
+#   BOARD_TAG    = uno
+#   MONITOR_PORT = /dev/cu.usb*
 #
-#       include /usr/share/arduino/Arduino.mk
+#   include /usr/share/arduino/Arduino.mk
 #
 # Hopefully these will be self-explanatory but in case they're not:
 #
-#    ARDUINO_LIBS - A list of any libraries used by the sketch (we
-#                   assume these are in $(ARDUINO_DIR)/hardware/libraries
-#                   or your sketchbook's libraries directory)
+#   ARDUINO_LIBS - A list of any libraries used by the sketch (we
+#                  assume these are in $(ARDUINO_DIR)/hardware/libraries
+#                  or your sketchbook's libraries directory)
 #
-#    MONITOR_PORT - The port where the Arduino can be found (only needed
-#                   when uploading)
+#   MONITOR_PORT - The port where the Arduino can be found (only needed
+#                  when uploading)
 #
-#    BOARD_TAG    - The tag for the board e.g. uno or mega
-#                   'make show_boards' shows a list
+#   BOARD_TAG    - The tag for the board e.g. uno or mega
+#                  'make show_boards' shows a list
 #
 # If you have your additional libraries relative to your source,
 # rather than in your "sketchbook", also set USER_LIB_PATH, like this
 # example:
 #
-#        USER_LIB_PATH := $(realpath ../../libraries)
+#   USER_LIB_PATH := $(realpath ../../libraries)
 #
 # If you've added the Arduino-Makefile repository to your git repo as
 # a submodule (or other similar arrangement), you might have lines
 # like this in your Makefile:
 #
-#        ARDMK_DIR := $(realpath ../../tools/Arduino-Makefile)
-#        include $(ARDMK_DIR)/Arduino.mk
+#   ARDMK_DIR := $(realpath ../../tools/Arduino-Makefile)
+#   include $(ARDMK_DIR)/Arduino.mk
 #
 # In any case, once this file has been created the typical workflow is
 # just.
@@ -146,9 +146,10 @@
 # All of the object files are created in the build-{BOARD_TAG}
 # subdirectory. All sources should be in the current directory and can
 # include:
-#  - at most one .pde or .ino file which will be treated as C++ after
-#    the standard Arduino header and footer have been affixed.
-#  - any number of .c, .cpp, .s and .h files
+#
+# - at most one .pde or .ino file which will be treated as C++ after
+#   the standard Arduino header and footer have been affixed.
+# - any number of .c, .cpp, .s and .h files
 #
 # Included libraries are built in the build-{BOARD_TAG}/libs
 # subdirectory.
@@ -183,7 +184,7 @@
 # The fairly useful thing to know is that you can bind another key to
 # escape too, by creating $HOME{.screenrc} containing e.g.
 #
-#    bindkey ^C kill
+#   bindkey ^C kill
 #
 # If you want to change the baudrate, just set MONITOR_BAUDRATE. If
 # you don't set it, it tries to read from the sketch. If it couldn't
@@ -196,28 +197,27 @@
 # You need to specify some details of your ISP programmer and might
 # also need to specify the fuse values:
 #
-#     ISP_PROG	   = stk500v2
-#     ISP_PORT     = /dev/ttyACM0
+#   ISP_PROG = stk500v2
+#   ISP_PORT = /dev/ttyACM0
 #
 # You might also need to set the fuse bits, but typically they'll be
 # read from boards.txt, based on the BOARD_TAG variable:
 #
-#     ISP_LOCK_FUSE_PRE  = 0x3f
-#     ISP_LOCK_FUSE_POST = 0xcf
-#     ISP_HIGH_FUSE      = 0xdf
-#     ISP_LOW_FUSE       = 0xff
-#     ISP_EXT_FUSE       = 0x01
+#   ISP_LOCK_FUSE_PRE  = 0x3f
+#   ISP_LOCK_FUSE_POST = 0xcf
+#   ISP_HIGH_FUSE      = 0xdf
+#   ISP_LOW_FUSE       = 0xff
+#   ISP_EXT_FUSE       = 0x01
 #
 # You can specify to also upload the EEPROM file:
-#     ISP_EEPROM   = 1
+#   ISP_EEPROM   = 1
 #
 # I think the fuses here are fine for uploading to the ATmega168
 # without bootloader.
 #
 # To actually do this upload use the ispload target:
 #
-#    make ispload
-#
+#   $ make ispload
 #
 ########################################################################
 #
@@ -230,28 +230,28 @@
 # ALTERNATE_CORE, assuming your core is in your ~/sketchbook/hardware
 # directory. For example:
 #
-# ISP_PORT          = /dev/ttyACM0
-# BOARD_TAG         = attiny85
-# ALTERNATE_CORE    = attiny-master
+#   ISP_PORT          = /dev/ttyACM0
+#   BOARD_TAG         = attiny85
+#   ALTERNATE_CORE    = attiny-master
 #
 # To use the more complex arduino-tiny and TinyCore2 cores, you must
 # also set ARDUINO_CORE_PATH and ARDUINO_VAR_PATH to the core
 # directory, as these cores essentially replace the main Arduino core.
 # For example:
 #
-# ISP_PORT          = /dev/ttyACM0
-# BOARD_TAG         = attiny85at8
-# ALTERNATE_CORE    = arduino-tiny
-# ARDUINO_VAR_PATH  = ~/sketchbook/hardware/arduino-tiny/cores/tiny
-# ARDUINO_CORE_PATH = ~/sketchbook/hardware/arduino-tiny/cores/tiny
+#   ISP_PORT          = /dev/ttyACM0
+#   BOARD_TAG         = attiny85at8
+#   ALTERNATE_CORE    = arduino-tiny
+#   ARDUINO_VAR_PATH  = ~/sketchbook/hardware/arduino-tiny/cores/tiny
+#   ARDUINO_CORE_PATH = ~/sketchbook/hardware/arduino-tiny/cores/tiny
 #
 # or....
 #
-# ISP_PORT          = /dev/ttyACM0
-# BOARD_TAG         = attiny861at8
-# ALTERNATE_CORE    = tiny2
-# ARDUINO_VAR_PATH  = ~/sketchbook/hardware/tiny2/cores/tiny
-# ARDUINO_CORE_PATH = ~/sketchbook/hardware/tiny2/cores/tiny
+#   ISP_PORT          = /dev/ttyACM0
+#   BOARD_TAG         = attiny861at8
+#   ALTERNATE_CORE    = tiny2
+#   ARDUINO_VAR_PATH  = ~/sketchbook/hardware/tiny2/cores/tiny
+#   ARDUINO_CORE_PATH = ~/sketchbook/hardware/tiny2/cores/tiny
 #
 ########################################################################
 
